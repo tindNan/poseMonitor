@@ -8,7 +8,7 @@
  * @format
  */
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   SafeAreaView,
   ScrollView,
@@ -26,13 +26,14 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-import Constants from 'expo-constants';
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-react-native';
+
 
 const Section: React.FC<{
   title: string;
 }> = ({children, title}) => {
   const isDarkMode = useColorScheme() === 'dark';
-  console.log(Constants.systemFonts);
   return (
     <View style={styles.sectionContainer}>
       <Text
@@ -60,6 +61,18 @@ const Section: React.FC<{
 const App = () => {
   const isDarkMode = useColorScheme() === 'dark';
 
+  const [tfReady, setTfReady] = useState(false);
+  useEffect(() => {
+    (async () => {
+      try {
+        await tf.ready();
+        setTfReady(true);
+      } catch (e) {
+        console.log(e);
+      }
+    })()
+  }, []);
+
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
@@ -81,6 +94,9 @@ const App = () => {
           </Section>
           <Section title="See Your Changes">
             <ReloadInstructions />
+          </Section>
+          <Section title="Tensorflow loaded?">
+            Tf Ready value: {tfReady.toString()}
           </Section>
           <Section title="Debug">
             <DebugInstructions />
